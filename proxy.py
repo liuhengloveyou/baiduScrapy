@@ -9,16 +9,13 @@ import hashlib
 import string
 import zipfile
 import random
-
+import sys
 
 class Proxy(object):
+    # 入参
     proxyServeAddr = "http://125.88.158.218:8082"
     proxyServePwd = "lovarkck"
     area = [] # 代理IP区域编号列表
-    domain = ''
-    port = 0
-    user = ''
-    passwd = ''
     
 
     def open(self):
@@ -26,24 +23,37 @@ class Proxy(object):
         url= "{}/open?api={}".format(self.proxyServeAddr, self.proxyServePwd)
         if len(self.area) > 0:
             url = self.proxyServeAddr + '/open?api={}&area={}'.format(self.proxyServePwd, self.area[random.randint(0, len(self.area)-1)])
-        resp = requests.get(url, headers=headers)
-        if resp:
-            # print(resp.status_code, resp.json())
-            if resp.status_code == 200:
+            
+        try:
+            resp = requests.get(url, headers=headers)
+            if resp and resp.status_code == 200:
                 respJson = resp.json()
                 if respJson['code'] == 200 and len(respJson['port']) > 0:
-                    self.domain  = respJson['domain']
-                    self.port = respJson['port'][0]
-                    self.user = respJson['authuser']
-                    self.passwd = respJson['authpass']
-                    return respJson['domain'], respJson['port'][0], respJson['authuser'], respJson['authpass']
+                    return respJson['domain'], respJson['port'][0]
+                    # self.domain  = respJson['domain']
+                    # self.port = respJson['port'][0]
+                    # self.user = respJson['authuser']
+                    # self.passwd = respJson['authpass']
+        except Exception as ex:
+            print("proxy.open ERR:", ex, sys.exc_info()[2].tb_lineno)
 
     def close(self, port=None):
         if port is None:
-            port = self.port
+            return
         resp = requests.get(self.proxyServeAddr + '/close?api=pkajuzne&&port={}'.format(port))
         if resp and resp.status_code == 200:
             print("close proxy:", resp.json())
+    
+    def getMyOutIP(self, proxyAddr):
+        proxies={'http': proxyAddr}
+        try:
+            resp = requests.get("http://ip.fuzu.pro", proxies=proxies, headers={'User-agent': 'curl'})
+            if resp and resp.status_code == 200:
+                respJson = resp.json()
+                return respJson["data"]
+        except Exception as ex:
+            print("getMyOutIP ERR:", ex, sys.exc_info()[2].tb_lineno)    
+        return None
 
 
     def create_proxyauth_extension(self, scheme='http'):

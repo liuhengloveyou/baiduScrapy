@@ -21,46 +21,24 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 
-greeneleTask = {
-    'keyWord': ['摆地摊'],
-    'domain': 'green-ele',
-    'title': '绿色地摊创业项目网',
-    'maxPage': 10,
-    'callback': greenele
-}
-
-def greenele(browser):
-    i = 0
-    windowstabs=browser.window_handles
-    print(windowstabs)
-    while len(windowstabs) == 1 and i <= 3:
-        print("windowstabs: ", i, windowstabs)
-        i = i+1
-        time.sleep(1)
-        windowstabs=browser.window_handles
-    if len(windowstabs) == 1:
-        return
-    #切换到新窗口
-    browser.switch_to.window(windowstabs[1])
-   
-    a_text=['首页', '摆地摊技巧', '摆地摊什么赚钱', '地摊交易', '地摊图片']
-    for i in range(0, random.randint(3,7)):
+def tiantaijituan(browser):
+    a_text=['首页', "产品中心", "公司概况", "招商合作", "关于我们", "会员注册", "第三终端招商", "新闻中心", "联系我们"]
+    for i in range(0, random.randint(4,10)):
         try:
             txt=a_text[random.randint(0,len(a_text)-1)]
             print(">>>>>>",txt)
             WebDriverWait(browser, 10).until(EC.visibility_of_all_elements_located((By.LINK_TEXT, txt)))
-            WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.LINK_TEXT, txt)))
-
-            # 先滚动
-            for j in range(0, random.randint(3,8)):
+            WebDriverWait(browser, 30).until(EC.element_to_be_clickable((By.LINK_TEXT, txt)))
+            
+            # 先滚动下去
+            for j in range(0, random.randint(2,8)):
                 browser.execute_script('window.scrollBy(0,{})'.format(800*random.random()))
                 time.sleep(2*random.random())
-            # 滚动顶
+            # 再滚动到顶
             time.sleep(2*random.random())
             for j in range(0, random.randint(1,6)):
                 browser.execute_script('window.scrollBy(0,{})'.format(-800*random.random()))
                 time.sleep(2*random.random())
-            time.sleep(2*random.random())
             browser.execute_script("window.scrollTo(0,0);")
 
             # 点
@@ -73,13 +51,11 @@ def greenele(browser):
                     break
         except Exception as ex:
             s=sys.exc_info()  
-            print("greenele ERR:", s[2].tb_lineno, ex)            
+            print("huimeisz ERR:", s[2].tb_lineno, ex)
             browser.refresh()
-            time.sleep(3*random.random())
-    print(">>>end greenele")
-    time.sleep(int(random.random()*2))
-    browser.close()
-    browser.switch_to.window(windowstabs[0])
+            time.sleep(1)
+            browser.refresh()
+            time.sleep(2)
     
 ###############################################################################
 ###############################################################################
@@ -87,7 +63,6 @@ if __name__ == "__main__":
     options = webdriver.ChromeOptions()
     options.add_experimental_option("detach", True);
     options.add_experimental_option('excludeSwitches', ['enable-automation'])
-    options.add_argument('lang=zh_CN.UTF-8')
         
     browser = webdriver.Chrome(options = options)
     browser.set_page_load_timeout(30)  # 设置页面加载超时
@@ -95,8 +70,8 @@ if __name__ == "__main__":
     browser.implicitly_wait(10)
     browser.delete_all_cookies()
     try:
-        browser.get('http://www.green-ele.com/')
-        greenele(browser)
+        browser.get('http://www.tiantaijituan.com/')
+        tiantaijituan(browser)
     finally:
         browser.close()
 

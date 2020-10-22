@@ -28,7 +28,8 @@ from ua import UA
 
 class baidu(object):
     browser=None
-    proxy=None
+    chromeProfilePath=None # chromeProfile/27/18/120/48
+    proxy=None # 127.0.0.1:8080
     task=None
 
     def __init__(self):
@@ -36,61 +37,51 @@ class baidu(object):
 
     def openChrome(self):
         options = webdriver.ChromeOptions()
+        options.page_load_strategy = 'eager' # DOM access is ready, but other resources like images may still be loading
+        options.add_experimental_option("detach", True)
+        options.add_experimental_option('excludeSwitches', ['enable-automation']) # 关闭正受到自动测试软件的控制
+        # options.add_argument('--headless') #浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
+        options.add_argument('--disable-infobars') #防止Chrome显示“Chrome正在被自动化软件控制”的通知
+        options.add_argument('––single-process')
+        options.add_argument("--no-default-browser-check")
+        options.add_argument('–-disable-plugins')
+        options.add_argument("--disable-extensions")
+        options.add_argument('--no-sandbox') #解决DevToolsActivePort文件不存在的报错, 是让Chrome在root权限下跑
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument("--ignore-certificate-errors")
+        # options.add_argument('--disable-gpu') #谷歌文档提到需要加上这个属性来规避bug
+        # options.add_argument('--hide-scrollbars') #隐藏滚动条, 应对一些特殊页面
+        # options.add_argument('blink-settings=imagesEnabled=false') #不加载图片, 提升速度
+
+        # 设置chrome运行环境目录
+        if self.chromeProfilePath != None:
+            options.add_argument("--user-data-dir={}".format(self.chromeProfilePath)); 
+
         # 设置UA
         ua=UA().get()
         options.add_argument('user-agent=' + ua)
         print('ua>>>: ', ua)
+
         # 设置代理
         if self.proxy != None:
-            proxyDomain, proxyPort, _, _ = self.proxy.open()
-            print("proxy>>>: ", proxyDomain, proxyPort)
-            # options.add_argument("--proxy-server=http://{}:{}".format(proxyDomain, proxyPort))
-            proxyauth_plugin_path = self.proxy.create_proxyauth_extension()
-            options.add_extension(proxyauth_plugin_path)
-
-        options.add_experimental_option("detach", True)
-        options.add_argument('--disable-infobars') #防止Chrome显示“Chrome正在被自动化软件控制”的通知
-        options.add_experimental_option('excludeSwitches', ['enable-automation']) # 关闭正受到自动测试软件的控制
-        options.add_argument('lang=zh_CN.UTF-8')
-        options.add_argument('––single-process')
-        options.add_argument("--ignore-certificate-errors")
-        options.add_argument("--no-default-browser-check")
-        # options.add_argument('--headless') #浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
-        # options.add_argument('--hide-scrollbars') #隐藏滚动条, 应对一些特殊页面
-        # options.add_argument('-–disable-javascript')
-        # options.add_argument('–-disable-plugins')
-        # options.add_argument("--disable-extensions")
-        # options.add_argument('--disable-logging')
-        # options.add_argument('--no-sandbox') #解决DevToolsActivePort文件不存在的报错, 是让Chrome在root权限下跑
-        # options.add_argument('--disable-dev-shm-usage')
-        # options.add_argument('window-size=1920x1080') #指定浏览器分辨率
-        # options.add_argument('--disable-gpu') #谷歌文档提到需要加上这个属性来规避bug
-        # options.add_argument('blink-settings=imagesEnabled=false') #不加载图片, 提升速度
-       
-        # 创建一个DesiredCapabilities实例
-        capabilities={}
-        capabilities['platform'] = "WINDOWS"
-        capabilities['version'] = "10"
-        capabilities["applicationCacheEnabled"] = "false"
-        capabilities.update(options.to_capabilities())
+            options.add_argument("--proxy-server=http://{}".format(self.proxy))
+            # proxyauth_plugin_path = self.proxy.create_proxyauth_extension()
+            # options.add_extension(proxyauth_plugin_path)    
 
         # self.browser = webdriver.Chrome(desired_capabilities=capabilities)
         self.browser = webdriver.Chrome(options = options)
-        self.browser.set_window_size(1024+random.randint(0, 300), 800+random.randint(0, 300))
+        self.browser.set_window_size(1200+random.randint(0, 500), 1000+random.randint(0, 500))
         self.browser.set_page_load_timeout(30)  # 设置页面加载超时
         self.browser.set_script_timeout(10)  # 设置页面异步js执行超时
         self.browser.implicitly_wait(10)
         # 清除浏览器cookies
-        self.browser.delete_all_cookies()
-        cookies = self.browser.get_cookies()
-        # print('cookies =', cookies)
-        # self.browser.get('chrome://settings/clearBrowserData')
+        # self.browser.delete_all_cookies()
+        # cookies = self.browser.get_cookies()
+        # # print('cookies =', cookies)
+        # # self.browser.get('chrome://settings/clearBrowserData')
 
     def clean(self):
-        if self.proxy:
-            self.proxy.close()
-        if self.browser:
-            self.browser.quit()
+        self.browser.quit()
     
     def onePage(self, currSearchKey):
         for i in range(0,2):
@@ -131,15 +122,13 @@ class baidu(object):
                         
                         time.sleep(random.random()*2)
                         self.browser.execute_script('window.scrollBy(0,{})'.format(-1*random.randint(150,260)))
-                        time.sleep(random.random()*2)
-                        time.sleep(random.random()*2)
+                        time.sleep(random.random()*3)
                         titleEle.click()
                         if gg == '':
                             return True # 不是广告才算点过，是广告继续
                 return False
             except Exception as ex:
-                s=sys.exc_info()  
-                print("record ERR:", ex, s[2].tb_lineno)
+                print("record ERR:", ex, sys.exc_info()[2].tb_lineno)
                 self.browser.refresh()
                 time.sleep(2)
 
@@ -180,14 +169,13 @@ class baidu(object):
                     break
 
                 # 下一页
-                for k in range(0, random.randint(4, 6)):
+                for k in range(0, random.randint(3, 6)):
                     self.browser.execute_script('window.scrollBy(0,{})'.format(600*random.random()))
                     time.sleep(random.random()*1.5)
                 # 滚动至元素ele可见位置
                 eles = self.browser.find_elements_by_css_selector('#rs table tr th a')
                 if eles and len(eles) > 0:
                     time.sleep(random.random()*3)
-                    time.sleep(random.random()*2)
                     ele = eles[0]
                     self.browser.execute_script("arguments[0].scrollIntoView();",ele)
                     nextPage = self.browser.find_element_by_partial_link_text("下一页 >")
@@ -211,7 +199,7 @@ class baidu(object):
         self.openChrome()
         try:
             self.browser.get("https://www.baidu.com/")
-            for key in range(0, random.randint(1, 2)):
+            for key in range(0, random.randint(1, len(self.task['keyWord']))):
                 currSearchKey = self.task['keyWord'][random.randint(0, len(self.task['keyWord'])-1)]
                 print('\n\nsearch oneKey>>>', currSearchKey)
                 self.oneKey(currSearchKey)

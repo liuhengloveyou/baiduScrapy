@@ -10,53 +10,57 @@ import sys
 from proxy import Proxy
 from baidu_com import baidu
 from common import mySleep
-from sites.babycarecn import babycare
-from sites.greenele import greenele
-from sites.huimeisz import huimeisz
+from sites.tiantaijituancom import tiantaijituan
 
-taskBabycare = {
-    'keyWord': ['早教加盟', '早教机构'],
-    'title': '东方爱婴',
-    'domain': 'www.babycare.cn',
-    'callback': babycare
-}
-greeneleTask = {
-    'keyWord': ['摆地摊'],
-    'domain': 'green-ele',
-    'title': '绿色地摊创业项目网',
-    'maxPage': 5,
-    'callback': greenele
-}
 
-# https://www.huimeisz.com/
+# http://www.tiantaijituan.com
 huimeiszTask = {
-    'keyWord': ['theraderm'],
-    'domain': 'huimeisz.com',
-    'title': 'Theraderm丝莱得代理',
+    'keyWord': ['骨髓肽', '枸杞肽', '天肽生物'],
+    'domain': 'www.tiantaijituan.com',
+    'title': '善肽堂',
     'maxPage': 5,
-    'callback': huimeisz
+    'callback': tiantaijituan
 }
 
 ###############################################################################
 ###############################################################################
 if __name__ == "__main__":
+    bai = None
+    proxy = None
+
     while True:
         mySleep()
 
-        proxy = None
-        b= None
         try:
-            proxy = Proxy()
-            proxy.area = [440300, 440600, 445200, 440300, 440500, 440100, 310000]
+            bai=baidu()
+            bai.task = huimeiszTask
 
-            b=baidu()
-            b.proxy = proxy
-            b.task = greeneleTask
-            b.run()
-        except Exception as ex:
-            s=sys.exc_info()  
-            print("main ERR:", ex, s[2].tb_lineno)
-        finally:
-            proxy.close()
-            b.clean()
+            proxy = Proxy()
+            proxy.area = [110000, 440300, 440600, 445200, 440300, 440500, 440100, 310000, 441300]
+            proxyDomain, proxyPort = proxy.open()
+            print("proxy>>>", proxyDomain, proxyPort)
             
+            outIP = proxy.getMyOutIP("http://{}:{}".format(proxyDomain, proxyPort))
+            print("outIP>>>", outIP)
+
+            # chromeProfile建目录
+            if outIP != None:
+                path = "{}/chromeProfile/{}".format(os.getcwd(), outIP["ip"].replace(".", "/"))
+                if not os.path.exists(path):
+                    os.makedirs(path)
+                bai.chromeProfilePath = path
+            bai.proxy = "{}:{}".format(proxyDomain, proxyPort)
+            
+            bai.run()
+        except Exception as ex:
+            print("main ERR:", ex, sys.exc_info()[2].tb_lineno)
+        finally:
+            if proxy != None:
+                proxy.close()
+            if bai != None:
+                bai.clean()    
+        
+    if proxy != None:
+        proxy.close()
+    if bai != None:
+        bai.clean() 
