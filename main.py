@@ -12,16 +12,24 @@ from proxy import Proxy
 from baidu_com import baidu
 from common import mySleep
 from sites.tiantaijituancom import tiantaijituan
-
+from sites.babycarecn import babycare
 
 # http://www.tiantaijituan.com
 huimeiszTask = {
-    'keyWord': ['骨髓肽', '天肽生物', '枸杞肽'],
+    'keyWord': ['枸杞肽', '骨髓肽', '天肽生物', '枸杞肽'],
     'domain': 'www.tiantaijituan.com',
     'title': '善肽堂',
     'maxPage': 8,
     'callback': tiantaijituan
-} # 
+}
+
+taskBabycare = {
+    'keyWord': ['早教机构', '早教加盟', '幼儿早教'],
+    'title': '东方爱婴',
+    'domain': 'www.babycare.cn',
+    'callback': babycare,
+    'maxPage': 10,
+}
 
 ###############################################################################
 ###############################################################################
@@ -37,10 +45,10 @@ if __name__ == "__main__":
 
         try:
             bai=baidu()
-            bai.task = huimeiszTask
+            bai.task = taskBabycare
 
             proxy = Proxy()
-            proxy.area = [110000, 440300, 440600, 445200, 440300, 440500, 440100, 310000, 441300]
+            # proxy.area = [110000, 440300, 440600, 445200, 440300, 440500, 440100, 310000, 441300]
             proxyDomain, proxyPort = proxy.open()
             print("proxy>>>", proxyDomain, proxyPort)
             
@@ -49,10 +57,14 @@ if __name__ == "__main__":
 
             # chromeProfile建目录
             if outIP != None:
-                path = "{}/chromeProfile/{}".format(os.getcwd(), outIP["ip"].replace(".", "/"))
-                if not os.path.exists(path):
-                    os.makedirs("{}/Cache".format(path))
-                bai.chromeProfilePath = path
+                UserDataPath = "{}/UserData/{}".format(os.getcwd(), outIP["ip"].replace(".", "/"))
+                if not os.path.exists(UserDataPath):
+                    os.makedirs(UserDataPath)
+                DiskCachePath = "{}/DiskCache/{}".format(os.getcwd(), outIP["ip"].replace(".", "/"))
+                if not os.path.exists(DiskCachePath):
+                    os.makedirs(DiskCachePath)
+                bai.userDataDir = UserDataPath
+                bai.diskCacheDir = DiskCachePath
             bai.proxy = "{}:{}".format(proxyDomain, proxyPort)
             
             bai.run()

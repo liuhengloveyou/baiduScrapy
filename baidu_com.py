@@ -28,7 +28,8 @@ from ua import UA
 
 class baidu(object):
     browser=None
-    chromeProfilePath=None # chromeProfile/27/18/120/48
+    userDataDir=None
+    diskCacheDir=None
     proxy=None # 127.0.0.1:8080
     task=None
 
@@ -55,9 +56,10 @@ class baidu(object):
         
 
         # 设置chrome运行环境目录
-        if self.chromeProfilePath != None:
-            options.add_argument("--user-data-dir={}".format(self.chromeProfilePath))
-            options.add_argument("--disk-cache-dir={}/Cache".format(self.chromeProfilePath))
+        if self.userDataDir != None:
+            options.add_argument("--user-data-dir={}".format(self.userDataDir))
+        if self.diskCacheDir != None:
+            options.add_argument("--disk-cache-dir={}".format(self.diskCacheDir))
 
         # 设置UA
         ua=UA().get()
@@ -76,11 +78,6 @@ class baidu(object):
         self.browser.set_page_load_timeout(30)  # 设置页面加载超时
         self.browser.set_script_timeout(10)  # 设置页面异步js执行超时
         self.browser.implicitly_wait(10)
-        # 清除浏览器cookies
-        # self.browser.delete_all_cookies()
-        # cookies = self.browser.get_cookies()
-        # # print('cookies =', cookies)
-        # # self.browser.get('chrome://settings/clearBrowserData')
 
     def clean(self):
         if self.browser != None:

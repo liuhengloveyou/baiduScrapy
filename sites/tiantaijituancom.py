@@ -37,6 +37,7 @@ def tiantaijituan(browser):
 
     a_text=['首页', "公司概况", "招商合作", "产品中心",] # 
     for i in range(0, random.randint(4,6)):
+        time.sleep(random.randint(1,3))
         try:            
             txt=a_text[random.randint(0,len(a_text)-1)]
             print(txt)
@@ -52,9 +53,7 @@ def tiantaijituan(browser):
             browser.execute_script("window.scrollTo(0,0);")
             
             # 点
-            time.sleep(random.randint(1,2))
-            WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, txt)))
-
+            WebDriverWait(browser, 30).until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, txt)))
             for btn in browser.find_elements_by_partial_link_text(txt):
                 if btn.text == txt:
                     act = ActionChains(browser)

@@ -26,13 +26,6 @@ from common import mySleep
 
 totalClickd=0 #点了多少次了
 
-taskBabycare = {
-    'keyWord': ['早教加盟', '早教机构'],
-    'title': '东方爱婴',
-    'domain': 'www.babycare.cn',
-    'callback': babycare
-}
-
 def babycare(browser):
         a_text=['关于我们', '课程体系', '早教中心', '智能测评', '新闻中心', '中心查询', '我要加盟']
         i = 0
