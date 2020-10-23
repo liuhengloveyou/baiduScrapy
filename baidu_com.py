@@ -56,7 +56,8 @@ class baidu(object):
 
         # 设置chrome运行环境目录
         if self.chromeProfilePath != None:
-            options.add_argument("--user-data-dir={}".format(self.chromeProfilePath)); 
+            options.add_argument("--user-data-dir={}".format(self.chromeProfilePath))
+            options.add_argument("--disk-cache-dir={}/Cache".format(self.chromeProfilePath))
 
         # 设置UA
         ua=UA().get()

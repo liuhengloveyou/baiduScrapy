@@ -6,6 +6,7 @@ import base64
 import os
 import hashlib
 import sys
+import random
 
 from proxy import Proxy
 from baidu_com import baidu
@@ -15,7 +16,7 @@ from sites.tiantaijituancom import tiantaijituan
 
 # http://www.tiantaijituan.com
 huimeiszTask = {
-    'keyWord': ['枸杞肽', '骨髓肽', '天肽生物'],
+    'keyWord': ['骨髓肽', '天肽生物', '枸杞肽'],
     'domain': 'www.tiantaijituan.com',
     'title': '善肽堂',
     'maxPage': 8,
@@ -27,6 +28,7 @@ huimeiszTask = {
 if __name__ == "__main__":
     bai = None
     proxy = None
+    random.seed()
 
     while True:
         print("#################################################################")
@@ -49,7 +51,7 @@ if __name__ == "__main__":
             if outIP != None:
                 path = "{}/chromeProfile/{}".format(os.getcwd(), outIP["ip"].replace(".", "/"))
                 if not os.path.exists(path):
-                    os.makedirs(path)
+                    os.makedirs("{}/Cache".format(path))
                 bai.chromeProfilePath = path
             bai.proxy = "{}:{}".format(proxyDomain, proxyPort)
             

@@ -32,16 +32,14 @@ def tiantaijituan(browser):
         return
     # 切换到新窗口
     browser.switch_to.window(windowstabs[1])
+    browser.maximize_window()
     print(">>>>>>begin tiantaijituan")
 
-    a_text=['首页', "产品中心", "公司概况", "招商合作"] # 
+    a_text=['首页', "公司概况", "招商合作", "产品中心",] # 
     for i in range(0, random.randint(4,6)):
-        try:
+        try:            
             txt=a_text[random.randint(0,len(a_text)-1)]
             print(txt)
-            WebDriverWait(browser, 10).until(EC.visibility_of_any_elements_located((By.PARTIAL_LINK_TEXT, txt)))
-            WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, txt)))
-
             # 先滚动下去
             for j in range(0, random.randint(2,8)):
                 browser.execute_script('window.scrollBy(0,{})'.format(800*random.random()))
@@ -54,7 +52,9 @@ def tiantaijituan(browser):
             browser.execute_script("window.scrollTo(0,0);")
             
             # 点
-            time.sleep(2*random.random())
+            time.sleep(random.randint(1,2))
+            WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, txt)))
+
             for btn in browser.find_elements_by_partial_link_text(txt):
                 if btn.text == txt:
                     act = ActionChains(browser)
@@ -87,16 +87,15 @@ def tiantaijituan(browser):
                     windowstabs=browser.window_handles
                     browser.switch_to.window(windowstabs[len(windowstabs)-1])
         except Exception as ex:
-            s=sys.exc_info()  
-            print("huimeisz ERR:", s[2].tb_lineno, ex)
+            print("huimeisz ERR:", sys.exc_info()[2].tb_lineno, ex)
             browser.refresh()
             browser.refresh()
             time.sleep(random.randint(1,2))
-        time.sleep(random.randint(1,2))
-        browser.close()
-        browser.switch_to.window(browser.window_handles[0])
-        print(">>>>>>>>end tiantaijituan")
-        return
+    time.sleep(random.randint(1,2))
+    browser.close()
+    browser.switch_to.window(browser.window_handles[0])
+    print(">>>>>>>>end tiantaijituan")
+    return
     
 ###############################################################################
 ###############################################################################
