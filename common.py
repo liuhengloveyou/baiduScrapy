@@ -15,7 +15,7 @@ def mySleep():
 
     s=0
     if hour == 0 or hour == 24:
-        s=random.randint(60,10*60) #1 ~ 10分钟
+        s=random.randint(60, 10*60) #1 ~ 10分钟
     elif hour >= 1 and hour < 5:
         s=random.randint(3*60, 10*60) # 3 ~ 10分钟
     elif hour == 5:
@@ -23,11 +23,11 @@ def mySleep():
     elif hour == 6:
         s=random.randint(30, 120) # 0.5 ~ 2分钟
     elif hour == 7:
-        s=random.randint(10,30) # 10秒 ~ 30秒
+        s=random.randint(10, 30) # 10秒 ~ 30秒
     elif hour == 8:
-        s=random.randint(2,10) # 3秒 ~ 10秒
+        s=random.randint(2, 8) # 2秒 ~ 8秒
     elif hour >= 9 and hour <= 11:
-        s=random.randint(0,2) # 0 ~ 2秒
+        s=random.randint(0, 2) # 0 ~ 2秒
     elif hour == 12:
         s=random.randint(0,3) # 0 ~ 3秒
     elif hour == 13:

@@ -38,9 +38,9 @@ class baidu(object):
     def openChrome(self):
         options = webdriver.ChromeOptions()
         options.page_load_strategy = 'eager' # DOM access is ready, but other resources like images may still be loading
-        options.add_experimental_option("detach", True)
+        # options.add_experimental_option("detach", True)
         options.add_experimental_option('excludeSwitches', ['enable-automation']) # 关闭正受到自动测试软件的控制
-        # options.add_argument('--headless') #浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
+        options.add_argument('--headless') #浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
         options.add_argument('--disable-infobars') #防止Chrome显示“Chrome正在被自动化软件控制”的通知
         options.add_argument('––single-process')
         options.add_argument("--no-default-browser-check")
@@ -49,9 +49,10 @@ class baidu(object):
         options.add_argument('--no-sandbox') #解决DevToolsActivePort文件不存在的报错, 是让Chrome在root权限下跑
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument("--ignore-certificate-errors")
+        # options.add_argument('blink-settings=imagesEnabled=false') #不加载图片, 提升速度
         # options.add_argument('--disable-gpu') #谷歌文档提到需要加上这个属性来规避bug
         # options.add_argument('--hide-scrollbars') #隐藏滚动条, 应对一些特殊页面
-        # options.add_argument('blink-settings=imagesEnabled=false') #不加载图片, 提升速度
+        
 
         # 设置chrome运行环境目录
         if self.chromeProfilePath != None:
@@ -81,7 +82,8 @@ class baidu(object):
         # # self.browser.get('chrome://settings/clearBrowserData')
 
     def clean(self):
-        self.browser.quit()
+        if self.browser != None:
+            self.browser.quit()
     
     def onePage(self, currSearchKey):
         for i in range(0,2):
@@ -103,9 +105,9 @@ class baidu(object):
                         # ele=result.find_element_by_link_text("广告")
                         # gg=ele.text
                     except Exception as ex:
-                        print("record ERR:", sys.exc_info()[2].tb_lineno, ex)
+                        print("one record ERR:", sys.exc_info()[2].tb_lineno, ex)
                         continue
-                    print(">>>url: ", urlEle.text, "\ttitle: ", titleEle.text, "\t广告: ", gg)
+                    # print(">>>url: ", urlEle.text, "\ttitle: ", titleEle.text, "\t广告: ", gg)
                     
                     # 广告跳过
                     if gg != '':
@@ -125,12 +127,15 @@ class baidu(object):
                         time.sleep(random.random()*3)
                         titleEle.click()
                         if gg == '':
+                            print("@@@@@@: ", urlEle.text, "\ttitle: ", titleEle.text, "\t广告: ", gg)
                             return True # 不是广告才算点过，是广告继续
                 return False
             except Exception as ex:
                 print("record ERR:", ex, sys.exc_info()[2].tb_lineno)
                 self.browser.refresh()
-                time.sleep(2)
+                time.sleep(1)
+                self.browser.refresh()
+                time.sleep(random.randint(1,2))
 
     def oneKey(self, searchKeyWord):
         clicked = 0
@@ -161,11 +166,12 @@ class baidu(object):
                     clicked += 1
                     callback = self.task['callback']
                     if callback != None:
-                        callback(self.browser)
+                        callback(self.browser) # 具体网站的逻辑
                 # 再往后看两页
                 if clicked > 0:
                     clicked += 1
                 if clicked > random.randint(1, 3):
+                    time.sleep(random.random()*3)
                     break
 
                 # 下一页
@@ -201,15 +207,12 @@ class baidu(object):
             self.browser.get("https://www.baidu.com/")
             for key in range(0, random.randint(1, len(self.task['keyWord']))):
                 currSearchKey = self.task['keyWord'][random.randint(0, len(self.task['keyWord'])-1)]
-                print('\n\nsearch oneKey>>>', currSearchKey)
-                self.oneKey(currSearchKey)
-                time.sleep(random.random())
+                time.sleep(random.randint(1, 3))
+                print('\n\nsearch oneKey>>>', currSearchKey)                
+                self.oneKey(currSearchKey)                
         except Exception as ex:
             s=sys.exc_info()  
             print("ERR: ", ex, s[2].tb_lineno)
-        finally:
-            print(">>>>>>>>>>>>>>>>>>colse")
-            self.browser.quit()
 
 ###############################################################################
 ###############################################################################

@@ -15,12 +15,12 @@ from sites.tiantaijituancom import tiantaijituan
 
 # http://www.tiantaijituan.com
 huimeiszTask = {
-    'keyWord': ['骨髓肽', '枸杞肽', '天肽生物'],
+    'keyWord': ['枸杞肽', '骨髓肽', '天肽生物'],
     'domain': 'www.tiantaijituan.com',
     'title': '善肽堂',
-    'maxPage': 5,
+    'maxPage': 8,
     'callback': tiantaijituan
-}
+} # 
 
 ###############################################################################
 ###############################################################################
@@ -29,6 +29,8 @@ if __name__ == "__main__":
     proxy = None
 
     while True:
+        print("#################################################################")
+        print("#################################################################")
         mySleep()
 
         try:
