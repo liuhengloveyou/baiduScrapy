@@ -13,6 +13,7 @@ from baidu_com import baidu
 from common import mySleep
 from sites.tiantaijituancom import tiantaijituan
 from sites.babycarecn import babycare
+from sites.mfzwycom import mfzwycom
 
 # http://www.tiantaijituan.com
 huimeiszTask = {
@@ -31,6 +32,14 @@ taskBabycare = {
     'maxPage': 10,
 }
 
+mfzwycomTask = {
+    'keyWord': ['地摊网站', '地摊项目网'],
+    'title': '地摊创业',
+    'domain': 'www.mfzwy.com',
+    'callback': mfzwycom,
+    'maxPage': 5,
+}
+
 ###############################################################################
 ###############################################################################
 if __name__ == "__main__":
@@ -45,7 +54,7 @@ if __name__ == "__main__":
 
         try:
             bai=baidu()
-            bai.task = taskBabycare
+            bai.task = mfzwycomTask
 
             proxy = Proxy()
             # proxy.area = [110000, 440300, 440600, 445200, 440300, 440500, 440100, 310000, 441300]
@@ -61,9 +70,6 @@ if __name__ == "__main__":
                 if not os.path.exists(UserDataPath):
                     os.makedirs(UserDataPath)
                 bai.userDataDir = UserDataPath
-                # DiskCachePath = "{}/DiskCache/{}".format(os.getcwd(), outIP["ip"].replace(".", "/"))
-                # if not os.path.exists(DiskCachePath):
-                #     os.makedirs(DiskCachePath)
                 
             bai.proxy = "{}:{}".format(proxyDomain, proxyPort)
             

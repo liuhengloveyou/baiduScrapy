@@ -37,10 +37,9 @@ class baidu(object):
 
     def openChrome(self):
         options = webdriver.ChromeOptions()
-        options.page_load_strategy = 'eager' # DOM access is ready, but other resources like images may still be loading
-        # options.add_experimental_option("detach", True)
-        options.add_experimental_option('excludeSwitches', ['enable-automation']) # 关闭正受到自动测试软件的控制
         options.add_argument('--headless') #浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
+        options.page_load_strategy = 'eager' # DOM access is ready, but other resources like images may still be loading
+        options.add_experimental_option('excludeSwitches', ['enable-automation']) # 关闭正受到自动测试软件的控制
         options.add_argument('--disable-infobars') #防止Chrome显示“Chrome正在被自动化软件控制”的通知
         options.add_argument('––single-process')
         options.add_argument("--no-default-browser-check")
@@ -52,7 +51,7 @@ class baidu(object):
         # options.add_argument('blink-settings=imagesEnabled=false') #不加载图片, 提升速度
         # options.add_argument('--disable-gpu') #谷歌文档提到需要加上这个属性来规避bug
         # options.add_argument('--hide-scrollbars') #隐藏滚动条, 应对一些特殊页面
-        
+        # options.add_experimental_option("detach", True)
 
         # 设置chrome运行环境目录
         if self.userDataDir != None:
