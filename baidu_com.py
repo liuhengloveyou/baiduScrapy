@@ -29,7 +29,6 @@ from ua import UA
 class baidu(object):
     browser=None
     userDataDir=None
-    diskCacheDir=None
     proxy=None # 127.0.0.1:8080
     task=None
 
@@ -58,8 +57,8 @@ class baidu(object):
         # 设置chrome运行环境目录
         if self.userDataDir != None:
             options.add_argument("--user-data-dir={}".format(self.userDataDir))
-        if self.diskCacheDir != None:
-            options.add_argument("--disk-cache-dir={}".format(self.diskCacheDir))
+        # if self.diskCacheDir != None:
+        #     options.add_argument("--disk-cache-dir={}".format(self.diskCacheDir))
 
         # 设置UA
         ua=UA().get()

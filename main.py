@@ -24,7 +24,7 @@ huimeiszTask = {
 }
 
 taskBabycare = {
-    'keyWord': ['早教机构', '早教加盟', '幼儿早教'],
+    'keyWord': ['早教机构'],
     'title': '东方爱婴',
     'domain': 'www.babycare.cn',
     'callback': babycare,
@@ -60,11 +60,11 @@ if __name__ == "__main__":
                 UserDataPath = "{}/UserData/{}".format(os.getcwd(), outIP["ip"].replace(".", "/"))
                 if not os.path.exists(UserDataPath):
                     os.makedirs(UserDataPath)
-                DiskCachePath = "{}/DiskCache/{}".format(os.getcwd(), outIP["ip"].replace(".", "/"))
-                if not os.path.exists(DiskCachePath):
-                    os.makedirs(DiskCachePath)
                 bai.userDataDir = UserDataPath
-                bai.diskCacheDir = DiskCachePath
+                # DiskCachePath = "{}/DiskCache/{}".format(os.getcwd(), outIP["ip"].replace(".", "/"))
+                # if not os.path.exists(DiskCachePath):
+                #     os.makedirs(DiskCachePath)
+                
             bai.proxy = "{}:{}".format(proxyDomain, proxyPort)
             
             bai.run()
