@@ -51,7 +51,7 @@ def mfzwycom(browser):
 
                 # 点新闻
                 news = browser.find_elements_by_class_name("news-item")
-                if random.randint(1, 3) == 1 and len(news) > 1:
+                if random.randint(1, 2) == 1 and len(news) > 1:
                     print("看新闻")
                     time.sleep(5*random.random())
                     ele = news[random.randint(0, len(news)-1)]

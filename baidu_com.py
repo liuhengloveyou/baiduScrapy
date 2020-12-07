@@ -22,7 +22,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-from common import mySleep
+from common import *
 from proxy import Proxy
 from ua import UA
 
@@ -37,7 +37,7 @@ class baidu(object):
 
     def openChrome(self):
         options = webdriver.ChromeOptions()
-        options.add_argument('--headless') #浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
+        # options.add_argument('--headless') #浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
         options.page_load_strategy = 'eager' # DOM access is ready, but other resources like images may still be loading
         options.add_experimental_option('excludeSwitches', ['enable-automation']) # 关闭正受到自动测试软件的控制
         options.add_argument('--disable-infobars') #防止Chrome显示“Chrome正在被自动化软件控制”的通知
@@ -48,16 +48,18 @@ class baidu(object):
         options.add_argument('--no-sandbox') #解决DevToolsActivePort文件不存在的报错, 是让Chrome在root权限下跑
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument("--ignore-certificate-errors")
+        options.add_argument('--disable-gpu') #谷歌文档提到需要加上这个属性来规避bug
+        options.add_argument('--hide-scrollbars') #隐藏滚动条, 应对一些特殊页面
         # options.add_argument('blink-settings=imagesEnabled=false') #不加载图片, 提升速度
-        # options.add_argument('--disable-gpu') #谷歌文档提到需要加上这个属性来规避bug
-        # options.add_argument('--hide-scrollbars') #隐藏滚动条, 应对一些特殊页面
         # options.add_experimental_option("detach", True)
 
         # 设置chrome运行环境目录
         if self.userDataDir != None:
             options.add_argument("--user-data-dir={}".format(self.userDataDir))
-        # if self.diskCacheDir != None:
-        #     options.add_argument("--disk-cache-dir={}".format(self.diskCacheDir))
+        DiskCachePath = "{}/DiskCache".format(os.getcwd())
+        if not os.path.exists(DiskCachePath):
+            os.makedirs(DiskCachePath)
+        options.add_argument("--disk-cache-dir={}".format(DiskCachePath))
 
         # 设置UA
         ua=UA().get()
@@ -161,8 +163,8 @@ class baidu(object):
                     time.sleep(random.random())
                     clicked += 1
                     callback = self.task['callback']
-                    if callback != None:
-                        callback(self.browser) # 具体网站的逻辑
+                    switchTab(self.browser, 1)
+                    callback(self.browser).run() # 具体网站的逻辑
                 # 再往后看两页
                 if clicked > 0:
                     clicked += 1

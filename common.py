@@ -41,3 +41,15 @@ def mySleep():
     print("本地时间为 :", hour, s)
     time.sleep(s)
     
+def switchTab(browser, index):
+    i = 0
+    while i <= 3:
+        windowstabs=browser.window_handles
+        if len(windowstabs) >= index:
+            # 切换到新窗口
+            browser.switch_to.window(windowstabs[index])
+            return True
+        i = i+1
+        time.sleep(1)
+        
+    return False

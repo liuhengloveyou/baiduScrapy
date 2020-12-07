@@ -14,6 +14,7 @@ from common import mySleep
 from sites.tiantaijituancom import tiantaijituan
 from sites.babycarecn import babycare
 from sites.mfzwycom import mfzwycom
+from sites.www_keypleasure_com_cn import keypleasure
 
 # http://www.tiantaijituan.com
 huimeiszTask = {
@@ -32,12 +33,12 @@ taskBabycare = {
     'maxPage': 10,
 }
 
-mfzwycomTask = {
-    'keyWord': ['地摊网站', '地摊项目网'],
-    'title': '地摊创业',
-    'domain': 'www.mfzwy.com',
-    'callback': mfzwycom,
-    'maxPage': 5,
+keypleasureTask = {
+    'keyWord': ['女性快感增强液'],
+    'title': '美国品牌KeY',
+    'domain': 'www.keypleasure.com.cn',
+    'callback': keypleasure,
+    'maxPage': 10,
 }
 
 ###############################################################################
@@ -50,28 +51,28 @@ if __name__ == "__main__":
     while True:
         print("#################################################################")
         print("#################################################################")
-        mySleep()
+        # mySleep()
 
         try:
             bai=baidu()
-            bai.task = mfzwycomTask
+            bai.task = keypleasureTask
 
-            proxy = Proxy()
+            # proxy = Proxy()
             # proxy.area = [110000, 440300, 440600, 445200, 440300, 440500, 440100, 310000, 441300]
-            proxyDomain, proxyPort = proxy.open()
-            print("proxy>>>", proxyDomain, proxyPort)
+            # proxyDomain, proxyPort = proxy.open()
+            # print("proxy>>>", proxyDomain, proxyPort)
             
-            outIP = proxy.getMyOutIP("http://{}:{}".format(proxyDomain, proxyPort))
-            print("outIP>>>", outIP)
+            # outIP = proxy.getMyOutIP("http://{}:{}".format(proxyDomain, proxyPort))
+            # print("outIP>>>", outIP)
 
-            # chromeProfile建目录
-            if outIP != None:
-                UserDataPath = "{}/UserData/{}".format(os.getcwd(), outIP["ip"].replace(".", "/"))
-                if not os.path.exists(UserDataPath):
-                    os.makedirs(UserDataPath)
-                bai.userDataDir = UserDataPath
-                
-            bai.proxy = "{}:{}".format(proxyDomain, proxyPort)
+            # # chromeProfile建目录
+            # if outIP != None:
+            #     UserDataPath = "{}/UserData/{}".format(os.getcwd(), outIP["ip"].replace(".", "/"))
+            #     if not os.path.exists(UserDataPath):
+            #         os.makedirs(UserDataPath)
+            #     bai.userDataDir = UserDataPath
+
+            # bai.proxy = "{}:{}".format(proxyDomain, proxyPort)
             
             bai.run()
         except Exception as ex:

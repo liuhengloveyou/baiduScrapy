@@ -13,7 +13,7 @@ import sys
 
 class Proxy(object):
     # 入参
-    proxyServeAddr = "http://125.88.158.218:8082"
+    proxyServeAddr = "http://113.96.182.17:8082"
     proxyServePwd = "lovarkck"
     area = [] # 代理IP区域编号列表
     
@@ -26,14 +26,20 @@ class Proxy(object):
             
         try:
             resp = requests.get(url, headers=headers)
-            if resp and resp.status_code == 200:
-                respJson = resp.json()
-                if respJson['code'] == 200 and len(respJson['port']) > 0:
-                    return respJson['domain'], respJson['port'][0]
-                    # self.domain  = respJson['domain']
-                    # self.port = respJson['port'][0]
-                    # self.user = respJson['authuser']
-                    # self.passwd = respJson['authpass']
+            if resp.status_code != 200:
+                print("proxy.open ERR:", resp)
+                return
+            
+            respJson = resp.json()
+            if respJson['code'] != 200 or len(respJson['port']) <= 0:
+                print("proxy.open resp ERR:", respJson)
+                return
+            
+            return respJson['domain'], respJson['port'][0]
+            # self.domain  = respJson['domain']
+            # self.port = respJson['port'][0]
+            # self.user = respJson['authuser']
+            # self.passwd = respJson['authpass']
         except Exception as ex:
             print("proxy.open ERR:", ex, sys.exc_info()[2].tb_lineno)
 
