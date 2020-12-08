@@ -27,7 +27,7 @@ class Proxy(object):
         try:
             resp = requests.get(url, headers=headers)
             if resp.status_code != 200:
-                print("proxy.open ERR:", resp)
+                print("proxy.open get ERR:", resp)
                 return
             
             respJson = resp.json()
@@ -53,7 +53,7 @@ class Proxy(object):
     def getMyOutIP(self, proxyAddr):
         proxies={'http': proxyAddr}
         try:
-            resp = requests.get("http://ip.fuzu.pro", proxies=proxies, headers={'User-agent': 'curl'})
+            resp = requests.get("http://ip.utool.pro/", proxies=proxies, headers={'User-agent': 'curl'})
             if resp and resp.status_code == 200:
                 respJson = resp.json()
                 return respJson["data"]

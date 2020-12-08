@@ -47,7 +47,8 @@ class Scroll(object):
             [(0, 0), (0, 1), (0, 4), (0, 13), (0, 34), (0, 66), (0, 82), (0, 105), (0, 124), (0, 156), (0, 173), (0, 195), (0, 218), (0, 228), (0, 241), (1, 248), (1, 253), (1, 255), (1, 255)],
             [(0, 0), (0, 2), (0, 7), (0, 43), (0, 76), (-1, 111), (-1, 148), (-1, 173), (-1, 194), (-1, 213), (-1, 243), (-1, 265), (-2, 286), (-1, 301), (0, 312), (1, 327), (1, 333), (2, 339), (2, 344), (2, 348), (2, 350), (2, 352), (3, 353), (3, 355)],
             [(0, 0), (0, 4), (0, 19), (-6, 67), (-16, 121), (-20, 166), (-23, 201), (-23, 226), (-23, 244), (-23, 273), (-22, 300), (-18, 323), (-13, 348), (-10, 362), (-8, 376), (-7, 384), (-6, 389), (-6, 392), (-6, 394), (-6, 396), (-6, 396)],
-            [(0, 0), (0, 0), (0, 2), (-1, 4), (-2, 10), (-6, 26), (-15, 55), (-43, 125), (-76, 212), (-107, 303), (-125, 363), (-149, 452), (-158, 502), (-163, 551), (-163, 601), (-163, 629), (-163, 646), (-162, 659), (-161, 664), (-160, 665), (-160, 666), (-160, 666), (-160, 668)]
+            [(0, 0), (0, 0), (0, 2), (-1, 4), (-2, 10), (-6, 26), (-15, 55), (-43, 125), (-76, 212), (-107, 303), (-125, 363), (-149, 452), (-158, 502), (-163, 551), (-163, 601), (-163, 629), (-163, 646), (-162, 659), (-161, 664), (-160, 665), (-160, 666), (-160, 668)],
+            [(0, 0), (-6, 13), (-13, 31), (-35, 90), (-63, 175), (-97, 275), (-133, 390), (-163, 501), (-176, 567), (-188, 637), (-193, 674), (-195, 697), (-197, 715), (-197, 724), (-197, 725), (-197, 726), (-197, 727), (-197, 727), (-197, 727), (-197, 728), (-197, 728), (-197, 728)]
         ]
 
         points=tracks[random.randint(0,len(tracks)-1)]
@@ -62,23 +63,41 @@ class Scroll(object):
         scrollHeight = self.browser.execute_script("return document.documentElement.scrollHeight || document.body.scrollHeight;")
         scrollTop = self.browser.execute_script("return document.documentElement.scrollTop || document.body.scrollTop;")
 
-        while (scrollTop + clientHeight) < (scrollHeight - 10):
+        while (scrollTop + clientHeight) < (scrollHeight - 100):
             self.scrollDown()
-            time.sleep(random.uniform(0.5, 2))
+            time.sleep(random.uniform(0.2, 1))
             scrollTop = self.browser.execute_script("return document.documentElement.scrollTop || document.body.scrollTop;")
     
     # 滚动到底部
     def scrollToTop(self):
-        while self.browser.execute_script("return document.documentElement.scrollTop || document.body.scrollTop;") > 0:
+        while self.browser.execute_script("return document.documentElement.scrollTop || document.body.scrollTop;") > 100:
             self.scrollUp()
-            time.sleep(random.uniform(0.5, 1.5))
+            time.sleep(random.uniform(0.1, 0.7))
+    
+    # 向下滚动到显示某ELE
+    def scrollDownIntoView(self, ele):
+        clientHeight = self.browser.execute_script("return document.documentElement.clientHeight || document.body.clientHeight;")
+        scrollHeight = self.browser.execute_script("return document.documentElement.scrollHeight || document.body.scrollHeight;")
+        scrollTop = self.browser.execute_script("return document.documentElement.scrollTop || document.body.scrollTop;")
+        eleY = ele.location['y']
+
+        while (scrollTop + clientHeight) < (scrollHeight - 100):
+            self.scrollDown()
+            scrollTop = self.browser.execute_script("return document.documentElement.scrollTop || document.body.scrollTop;")
+            if ((scrollTop + clientHeight > eleY) and (scrollTop < eleY)):
+                return
+            time.sleep(random.uniform(0.2, 1))
+
+
+
+    def get_track(self, distance:int)->list:
+      
     
 
 ###############################################################################
 ###############################################################################
-if __name__ == "__main__":  
+if __name__ == "__main__":
     options = webdriver.ChromeOptions()
-    options.add_experimental_option('excludeSwitches', ['enable-automation'])
     options.add_argument('lang=zh_CN.UTF-8')
 
     browser = webdriver.Chrome(options = options)
@@ -88,6 +107,8 @@ if __name__ == "__main__":
     browser.delete_all_cookies()
     try:
         browser.get('https://www.baidu.com/s?wd=selenium')
+        print(">>>>>>>>>>>>>", Scroll(browser).get_track(10))
+
         time.sleep(3)
         Scroll(browser).scrollToEnd()
         time.sleep(3)

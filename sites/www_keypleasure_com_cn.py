@@ -29,22 +29,20 @@ class keypleasure(object):
     browser=None
     a_text=['首页', "产品系列", "两性讲堂", "最新动向", "关于我们", "查验真伪"]
 
-
     def __init__(self, browser):
         self.browser = browser
 
     # 看产品1~2个
     def kancanpin(self):
         for i in range(0, random.randint(1, 2)):
-            time.sleep(random.uniform(1, 2))
-            try:                
-                # 滚动下去
-                for j in range(0, random.randint(3, 5)):
-                    Scroll(self.browser).scrollDown()
-                    time.sleep(random.uniform(0.5, 1.5))
-
+            try:
+                time.sleep(random.uniform(1, 2))
                 products = self.browser.find_elements_by_class_name("cpzi")
                 ele = products[random.randint(0, len(products)-1)]
+
+                # 滚到产品处
+                Scroll(self.browser).scrollDownIntoView(ele)
+
                 ActionChains(self.browser).move_to_element(ele).perform()
                 time.sleep(random.uniform(1, 2))
                 ActionChains(self.browser).click(ele).perform()
@@ -52,23 +50,25 @@ class keypleasure(object):
 
                 # 滚动下去
                 Scroll(self.browser).scrollToEnd()
-                # 返回
-                self.browser.back()
+                
             except Exception as ex:
                 print("kancanpin ERR:", sys.exc_info()[2].tb_lineno, ex)
+            finally:
+                # 返回
+                self.browser.back()
+
     
     # 看讲堂1~2个
     def kanjiangtang(self):
-        for i in range(0, random.randint(1, 2)):
+        for i in range(0, random.randint(0, 2)):
             time.sleep(random.uniform(1, 2))
             try:
-                # 滚动下去
-                for j in range(0, random.randint(3, 5)):
-                    Scroll(self.browser).scrollDown()
-                    time.sleep(random.uniform(0.5, 1.5))
-
                 products = self.browser.find_elements_by_class_name("wd11")
                 ele = products[random.randint(0, len(products)-1)]
+
+                # 滚到元素处
+                Scroll(self.browser).scrollDownIntoView(ele)
+
                 ActionChains(self.browser).move_to_element(ele).perform()
                 time.sleep(random.uniform(1, 2))
                 ActionChains(self.browser).click(ele).perform()
@@ -77,8 +77,7 @@ class keypleasure(object):
                 # 滚动下去
                 for j in range(0, random.randint(5,10)):
                     Scroll(self.browser).scrollDown()
-                    time.sleep(random.uniform(0.5, 1))
-
+                    time.sleep(random.uniform(0.2, 1))
                 # 返回
                 self.browser.back()
             except Exception as ex:
@@ -86,26 +85,28 @@ class keypleasure(object):
     
     # 看动态0~1个
     def kandongtai(self):
+        Scroll(self.browser).scrollToEnd()
+        time.sleep(random.uniform(0.1, 1))
+        Scroll(self.browser).scrollToTop()
+
         for i in range(0, random.randint(0, 1)):
             time.sleep(random.uniform(0.1, 2))
             try:
-                # 滚动下去
-                for j in range(0, random.randint(3, 6)):
-                    Scroll(self.browser).scrollDown()
-                    time.sleep(random.uniform(0.1, 1))
-
                 products = self.browser.find_elements_by_class_name("xiaoxizi")
                 ele = products[random.randint(0, len(products)-1)].find_element_by_tag_name("a")
+
+                # 滚到元素处
+                Scroll(self.browser).scrollDownIntoView(ele)
+
                 ActionChains(self.browser).move_to_element(ele).perform()
                 time.sleep(3*random.random())
                 ActionChains(self.browser).click(ele).perform()
                 time.sleep(3*random.random())
 
                 # 滚动下去
-                for j in range(0, random.randint(5,10)):
+                for j in range(0, random.randint(3,7)):
                     Scroll(self.browser).scrollDown()
-                    time.sleep(random.uniform(0.2, 1))
-
+                    time.sleep(random.uniform(0.1, 1))
                 # 返回
                 self.browser.back()
             except Exception as ex:
@@ -113,12 +114,12 @@ class keypleasure(object):
 
 
     def run(self):
-        for i in range(0, random.randint(3, 6)):
-            time.sleep(random.randint(1, 3))
+        for i in range(0, random.randint(3, 5)):
             try:
+                time.sleep(random.randint(1, 2))
                 # 先滚动下去
                 Scroll(self.browser).scrollToEnd()
-                time.sleep(random.uniform(1, 3))
+                time.sleep(random.uniform(1, 2))
                 # 再滚动到顶
                 Scroll(self.browser).scrollToTop()
                 
@@ -140,15 +141,10 @@ class keypleasure(object):
                     self.kanjiangtang()
                 elif txt == "最新动向":
                     self.kandongtai()
-                else:
-                    # 滚动下去
-                    Scroll(self.browser).scrollToEnd()
-            
             except Exception as ex:
                 print("keypleasure ERR:", sys.exc_info()[2].tb_lineno, ex)
                 self.browser.refresh()
-                self.browser.refresh()
-                time.sleep(random.randint(1,2))
+                time.sleep(random.uniform(1, 2))
         time.sleep(random.randint(1,2))
         self.browser.close()
         self.browser.switch_to.window(self.browser.window_handles[0])
@@ -158,8 +154,16 @@ class keypleasure(object):
 ###############################################################################
 if __name__ == "__main__":  
     options = webdriver.ChromeOptions()
-    options.add_experimental_option('excludeSwitches', ['enable-automation'])
     options.add_argument('lang=zh_CN.UTF-8')
+    options.page_load_strategy = 'eager' # DOM access is ready, but other resources like images may still be loading
+    options.add_experimental_option('excludeSwitches', ['enable-automation']) # 关闭正受到自动测试软件的控制
+    options.add_argument('--disable-infobars') #防止Chrome显示“Chrome正在被自动化软件控制”的通知
+    options.add_argument('––single-process')
+    options.add_argument("--no-default-browser-check")
+    options.add_argument('–-disable-plugins')
+    options.add_argument("--disable-extensions")
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument("--ignore-certificate-errors")
 
     browser = webdriver.Chrome(options = options)
     browser.set_page_load_timeout(30)  # 设置页面加载超时

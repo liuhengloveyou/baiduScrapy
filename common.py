@@ -51,5 +51,9 @@ def switchTab(browser, index):
             return True
         i = i+1
         time.sleep(1)
-        
     return False
+
+def sendHumanKeys(ele, text):
+    for w in text:
+        ele.send_keys(w)
+        time.sleep(random.uniform(0.1, 1))
