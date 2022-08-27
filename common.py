@@ -35,10 +35,10 @@ def mySleep():
     elif hour >= 14 and hour <= 18:
         s=random.randint(0,2) # 0 ~ 2秒
     elif hour >= 19 and hour <= 21:
-        s=random.randint(0,3) # 0 ~ 3秒
+        s=random.randint(0,5) # 0 ~ 3秒
     elif hour > 21 and hour <= 23:
-        s=random.randint(1,5) # 1 ~ 3秒
-    print("本地时间为 :", hour, s)
+        s=random.randint(2,8)
+    print("时间为 :", hour, s)
     time.sleep(s)
     
 def switchTab(browser, index):
@@ -54,6 +54,8 @@ def switchTab(browser, index):
     return False
 
 def sendHumanKeys(ele, text):
+    ele.clear()
+    time.sleep(random.uniform(0.2, 1))
     for w in text:
         ele.send_keys(w)
         time.sleep(random.uniform(0.1, 1))

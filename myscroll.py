@@ -70,7 +70,7 @@ class Scroll(object):
     
     # 滚动到底部
     def scrollToTop(self):
-        while self.browser.execute_script("return document.documentElement.scrollTop || document.body.scrollTop;") > 100:
+        while self.browser.execute_script("return document.documentElement.scrollTop || document.body.scrollTop;") > 50:
             self.scrollUp()
             time.sleep(random.uniform(0.1, 0.7))
     
@@ -82,17 +82,11 @@ class Scroll(object):
         eleY = ele.location['y']
 
         while (scrollTop + clientHeight) < (scrollHeight - 100):
-            self.scrollDown()
             scrollTop = self.browser.execute_script("return document.documentElement.scrollTop || document.body.scrollTop;")
             if ((scrollTop + clientHeight > eleY) and (scrollTop < eleY)):
                 return
+            self.scrollDown()
             time.sleep(random.uniform(0.2, 1))
-
-
-
-    def get_track(self, distance:int)->list:
-      
-    
 
 ###############################################################################
 ###############################################################################

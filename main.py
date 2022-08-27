@@ -34,7 +34,7 @@ taskBabycare = {
 }
 
 keypleasureTask = {
-    'keyWord': ['私密养护 key', '女性快感增强液', '延时外用喷剂'],
+    'keyWord': ['女性快感增强液', '延时外用喷剂', '私密养护 key', '女性快感增强液', '延时外用喷剂'],
     'title': '美国品牌KeY',
     'domain': 'www.keypleasure.com.cn',
     'callback': keypleasure,
@@ -49,16 +49,16 @@ if __name__ == "__main__":
     random.seed()
 
     while True:
+        print("#################################################################")
+        print("#################################################################")
         mySleep()
-        print("#################################################################")
-        print("#################################################################")
-
+        
         try:
             bai=baidu()
             bai.task = keypleasureTask
 
             proxy = Proxy()
-            proxy.area = [110000, 440300, 440600, 445200, 440300, 440500, 440100, 310000, 441300]
+            # proxy.area = [110000, 440300, 440600, 445200, 440300, 440500, 440100, 310000, 441300]
             proxyDomain, proxyPort = proxy.open()
             outIP = proxy.getMyOutIP("http://{}:{}".format(proxyDomain, proxyPort))
             print("proxy>>>", proxyDomain, proxyPort, outIP)

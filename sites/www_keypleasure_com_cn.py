@@ -49,6 +49,9 @@ class keypleasure(object):
                 time.sleep(random.uniform(1, 2))
 
                 # 滚动下去
+                for j in range(0, random.randint(3, 6)):
+                    time.sleep(random.uniform(1, 4))
+                    Scroll(self.browser).scrollDown()
                 Scroll(self.browser).scrollToEnd()
                 
             except Exception as ex:

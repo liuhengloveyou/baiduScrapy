@@ -14,6 +14,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotInteractableException
+from selenium.common.exceptions import StaleElementReferenceException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import TimeoutException
@@ -78,7 +79,7 @@ class baidu(object):
 
         # self.browser = webdriver.Chrome(desired_capabilities=capabilities)
         self.browser = webdriver.Chrome(options = options)
-        self.browser.set_window_size(1200+random.randint(0, 500), 800+random.randint(0, 500))
+        self.browser.set_window_size(1000+random.randint(0, 500), 800+random.randint(0, 500))
         self.browser.set_page_load_timeout(15)  # 设置页面加载超时
         self.browser.set_script_timeout(5)  # 设置页面异步js执行超时
         self.browser.implicitly_wait(1)
@@ -124,61 +125,56 @@ class baidu(object):
         inject();''')
                 
         # self.browser.execute_cdp_cmd('Network.setUserAgentOverride', {"userAgent": ua})
-        print("check UA: ", self.browser.execute_script("return navigator.userAgent;"))
-        print("check webdriver: ", self.browser.execute_script("return window.navigator.webdriver;"))
-        print("check platform: ", self.browser.execute_script("return window.navigator.platform;"))
-        print("check plugins: ", self.browser.execute_script("return navigator.plugins.length;"))
+        # print("check UA: ", self.browser.execute_script("return navigator.userAgent;"))
+        # print("check webdriver: ", self.browser.execute_script("return window.navigator.webdriver;"))
+        # print("check platform: ", self.browser.execute_script("return window.navigator.platform;"))
+        # print("check plugins: ", self.browser.execute_script("return navigator.plugins.length;"))
 
     def clean(self):
         if self.browser != None:
             self.browser.quit()
     
     def onePage(self, currSearchKey):
-        for i in range(0,2):
-            time.sleep(random.uniform(0.5, 1))
-            try:
-                WebDriverWait(self.browser, 10).until(EC.title_contains(currSearchKey))
-                WebDriverWait(self.browser, 10).until(EC.visibility_of_all_elements_located((By.XPATH, '//div[contains(@class, "result") and contains(@class, "c-container")]')))
-                WebDriverWait(self.browser, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, 'n')))                
-                WebDriverWait(self.browser, 10).until(EC.element_to_be_clickable((By.ID, 'su')))
+        time.sleep(random.uniform(0.5, 1))
+        WebDriverWait(self.browser, 10).until(EC.title_contains(currSearchKey))
+        WebDriverWait(self.browser, 10).until(EC.visibility_of_all_elements_located((By.XPATH, '//div[contains(@class, "result") and contains(@class, "c-container")]')))
+        WebDriverWait(self.browser, 10).until(EC.element_to_be_clickable((By.CLASS_NAME, 'n')))                
+        WebDriverWait(self.browser, 10).until(EC.element_to_be_clickable((By.ID, 'su')))
 
-                results=WebDriverWait(self.browser, 5, 0.2).until(lambda diver:self.browser.find_elements_by_xpath('//div[contains(@class, "result") and contains(@class, "c-container")]'))
-                for result in results:
-                    titleEle='' # 标题
-                    urlEle='' # URL
-                    gg='' # 广告标识
+        for i in range(2): # 出错重试
+            results=WebDriverWait(self.browser, 5, 0.2).until(lambda diver:self.browser.find_elements_by_xpath('//div[contains(@class, "result") and contains(@class, "c-container")]'))
+            for result in results:
+                titleEle='' # 标题
+                urlEle='' # URL
+                gg='' # 广告标识
 
-                    try:
-                        titleEle=WebDriverWait(self.browser, 3, 0.2).until(lambda diver:result.find_element_by_xpath('h3/a'))
-                        urlEle=result.find_element_by_class_name("c-showurl")
-                        # ele=result.find_element_by_link_text("广告")
-                        # gg=ele.text
-                    except Exception as ex:
-                        print("record ERR:", sys.exc_info()[2].tb_lineno, ex)
-                        continue
-                    # print("onePage: ", currSearchKey, urlEle.text, urlEle.text)
-                    
-                    # 广告跳过
-                    if gg != '':
-                        if random.randint(0, 100) == 0:
-                            pass # 点广告
-                        else:
-                            continue # 广告跳过
-
-                    # if (titleEle.text.find(self.task['title']) >= 0) and (urlEle.text.find(self.task['domain']) >= 0 or urlEle.text.find(self.task['title']) >= 0):
-                    if urlEle.text.find(self.task['domain']) >= 0:
-                        Scroll(self.browser).scrollDownIntoView(titleEle)
-                        time.sleep(random.uniform(1, 2))
-                        ActionChains(self.browser).click(titleEle).perform()
-                        
-                        if gg == '':
-                            print("@@HIT: ", urlEle.text, "\ttitle: ", titleEle.text, "\t广告: ", gg)
-                            return True # 不是广告才算点过，是广告继续
-                return False
-            except Exception as ex:
-                print("record ERR:", ex, sys.exc_info()[2].tb_lineno)
-                self.browser.refresh()
-                time.sleep(random.uniform(1, 2))
+                try:
+                    titleEle=WebDriverWait(self.browser, 2, 0.2).until(lambda diver:result.find_element_by_xpath('h3/a'))
+                    urlEle=result.find_element_by_class_name("c-showurl")
+                    # ele=result.find_element_by_link_text("广告")
+                    # gg=ele.text
+                except StaleElementReferenceException as e:
+                    print("one record ERR:", sys.exc_info()[2].tb_lineno, repr(e))
+                    break
+                except Exception as e:
+                    print("one record ERR:", sys.exc_info()[2].tb_lineno, repr(e))
+                    continue
+                # print("onePage: ", currSearchKey, urlEle.text, urlEle.text)
+                # 广告跳过
+                if gg != '':
+                    if random.randint(0, 100) == 0:
+                        pass # 点广告
+                    else:
+                        continue # 广告跳过
+                # if (titleEle.text.find(self.task['title']) >= 0) and (urlEle.text.find(self.task['domain']) >= 0 or urlEle.text.find(self.task['title']) >= 0):
+                if urlEle.text.find(self.task['domain']) >= 0:
+                    Scroll(self.browser).scrollDownIntoView(titleEle)
+                    time.sleep(random.uniform(1, 2))
+                    ActionChains(self.browser).click(titleEle).perform()
+                    if gg == '':
+                        print("@@HIT: ", urlEle.text, "\ttitle: ", titleEle.text, "\t广告: ", gg)
+                        return True # 不是广告才算点过，是广告继续
+        return False
 
     def oneKey(self, searchKeyWord):
         print('\n\nsearch word::', searchKeyWord)
@@ -188,11 +184,10 @@ class baidu(object):
             WebDriverWait(self.browser, 10, 0.2).until(EC.element_to_be_clickable((By.ID, 'su')))
             WebDriverWait(self.browser, 10, 0.2).until(EC.visibility_of_all_elements_located((By.ID, 'kw')))
 
-            #@@@ 
             kw=self.browser.find_element_by_id("kw")
             su=self.browser.find_element_by_id("su")
             ActionChains(self.browser).move_to_element(kw).click(kw).perform()#定位鼠标到指定元素
-            time.sleep(random.uniform(0.5, 2))
+            time.sleep(random.uniform(0.5, 1.5))
             sendHumanKeys(kw, searchKeyWord)
             
             ActionChains(self.browser).move_to_element(su).click(su).perform()
@@ -203,18 +198,19 @@ class baidu(object):
                 # WebDriverWait(self.browser, 10, 0.2).until(EC.text_to_be_present_in_element((By.XPATH, '//*[@id="page"]/strong/span[2]'), '{}'.format(p)))
                 #self.browser.find_element_by_xpath('//*[@id="page"]/strong/span[2]').text
                 
-                print('page: ', p)                
+                print('page: ', p, clicked)          
                 finded = self.onePage(searchKeyWord)
                 if clicked == 0 and True == finded:
-                    time.sleep(random.uniform(0.5, 1.5))
                     clicked += 1
+                    time.sleep(random.uniform(0.5, 1.5))
                     callback = self.task['callback']
                     switchTab(self.browser, 1)
                     callback(self.browser).run() # 具体网站的逻辑
+                    time.sleep(random.uniform(0.5, 1))
                 # 再往后看两页
                 if clicked > 0:
                     clicked += 1
-                if clicked > random.randint(1, 3):
+                if clicked > random.randint(1, 2):
                     time.sleep(random.random()*3)
                     break
 
@@ -225,6 +221,7 @@ class baidu(object):
                     ele = eles[0]
                     self.browser.execute_script("arguments[0].scrollIntoView();",ele)
                     nextPage = self.browser.find_element_by_partial_link_text("下一页 >")
+                    time.sleep(random.uniform(0.5, 1))
                     ActionChains(self.browser).move_to_element(nextPage).perform()#定位鼠标到指定元素
                     ActionChains(self.browser).click(nextPage).perform()
                     time.sleep(random.random())
@@ -246,8 +243,12 @@ class baidu(object):
 
         try:
             self.browser.get("https://www.baidu.com/")
+            keyIdx = random.randint(0, len(self.task['keyWord'])-1)
             for key in range(0, random.randint(1, len(self.task['keyWord']))):
-                currSearchKey = self.task['keyWord'][random.randint(0, len(self.task['keyWord'])-1)]
+                keyIdx += 1
+                if keyIdx >= len(self.task['keyWord']):
+                    keyIdx = 0
+                currSearchKey = self.task['keyWord'][keyIdx]
                 time.sleep(random.uniform(0.5, 2))
                 self.oneKey(currSearchKey)                
         except Exception as ex:
